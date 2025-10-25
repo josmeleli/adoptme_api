@@ -1,0 +1,256 @@
+{
+  "info": {
+    "name": "AdoptMe API - Sprint 1",
+    "description": "Colección completa de endpoints para la API de AdoptMe",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Test Conexión",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/test_connection.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "test_connection.php"]
+        }
+      }
+    },
+    {
+      "name": "1. Registro Usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@adoptme.com\",\n  \"password\": \"123456\",\n  \"name\": \"Usuario Test\",\n  \"phone\": \"987654321\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/register.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "register.php"]
+        }
+      }
+    },
+    {
+      "name": "2. Verificar Cuenta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user_id\": 1,\n  \"code\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/verify.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "verify.php"]
+        }
+      }
+    },
+    {
+      "name": "3. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test@adoptme.com\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/login.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "login.php"]
+        }
+      }
+    },
+    {
+      "name": "4. Obtener Perfil",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/users/getUser.php?id=1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "users", "getUser.php"],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Actualizar Perfil",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"name\": \"Usuario Test Actualizado\",\n  \"distrito\": \"San Isidro\",\n  \"phone\": \"987654321\",\n  \"especie\": \"Perro\",\n  \"tamano\": \"Mediano\",\n  \"edad\": \"Adulto\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/users/updateUser.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "users", "updateUser.php"]
+        }
+      }
+    },
+    {
+      "name": "6. Enviar Mensaje",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"from\": 1,\n  \"to\": 2,\n  \"message\": \"Hola, me interesa adoptar a Luna\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/chat/sendMessage.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "chat", "sendMessage.php"]
+        }
+      }
+    },
+    {
+      "name": "7. Obtener Mensajes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/chat/getMessages.php?user1=1&user2=2",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "chat", "getMessages.php"],
+          "query": [
+            {
+              "key": "user1",
+              "value": "1"
+            },
+            {
+              "key": "user2",
+              "value": "2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. Crear Adopción",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pet_id\": 1,\n  \"user_id\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost/adopciones_api/adoption/createAdoption.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "adoption", "createAdoption.php"]
+        }
+      }
+    },
+    {
+      "name": "9. Seguimiento Adopción",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/adoption/trackAdoption.php?id=1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "adoption", "trackAdoption.php"],
+          "query": [
+            {
+              "key": "id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "10. Obtener Notificaciones",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/notifications/getNotifications.php?user_id=1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "notifications", "getNotifications.php"],
+          "query": [
+            {
+              "key": "user_id",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "11. Cerrar Sesión",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer TU_TOKEN_AQUI"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost/adopciones_api/logout.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "logout.php"]
+        }
+      }
+    }
+  ]
+}
