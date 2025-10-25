@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "AdoptMe API - Sprint 1",
-    "description": "Colección completa de endpoints para la API de AdoptMe",
+    "name": "AdoptMe API - Sprint 1 & 2",
+    "description": "Colección completa de endpoints para la API de AdoptMe (incluye HU-004: Catálogo de Mascotas)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -250,6 +250,137 @@
           "host": ["localhost"],
           "path": ["adopciones_api", "logout.php"]
         }
+      }
+    },
+    {
+      "name": "12. SPRINT 2 - Catálogo de Mascotas (todas)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPets.php",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPets.php"]
+        },
+        "description": "HU-004 CA-001: Muestra todas las mascotas disponibles con foto, especie, edad y ubicación.\nCA-002: Mascotas urgentes aparecen primero.\nCA-003: Paginación con mínimo 6 resultados por página."
+      }
+    },
+    {
+      "name": "13. SPRINT 2 - Filtrar por Especie",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPets.php?especie=Perro",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPets.php"],
+          "query": [
+            {
+              "key": "especie",
+              "value": "Perro",
+              "description": "Valores: Perro, Gato"
+            }
+          ]
+        },
+        "description": "TR-06: Filtro por especie de mascota"
+      }
+    },
+    {
+      "name": "14. SPRINT 2 - Filtros Combinados",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPets.php?especie=Gato&tamano=Pequeño&categoria_edad=cachorro",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPets.php"],
+          "query": [
+            {
+              "key": "especie",
+              "value": "Gato"
+            },
+            {
+              "key": "tamano",
+              "value": "Pequeño",
+              "description": "Valores: Pequeño, Mediano, Grande"
+            },
+            {
+              "key": "categoria_edad",
+              "value": "cachorro",
+              "description": "Valores: cachorro (0-2), adulto (3-7), senior (8+)"
+            }
+          ]
+        },
+        "description": "TR-06: Múltiples filtros combinados"
+      }
+    },
+    {
+      "name": "15. SPRINT 2 - Solo Mascotas Urgentes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPets.php?urgentes=true",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPets.php"],
+          "query": [
+            {
+              "key": "urgentes",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "CA-002: Filtra solo mascotas urgentes ordenadas por prioridad"
+      }
+    },
+    {
+      "name": "16. SPRINT 2 - Paginación",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPets.php?page=2&limit=6",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPets.php"],
+          "query": [
+            {
+              "key": "page",
+              "value": "2",
+              "description": "Número de página (default: 1)"
+            },
+            {
+              "key": "limit",
+              "value": "6",
+              "description": "Resultados por página (default: 6, mínimo: 6)"
+            }
+          ]
+        },
+        "description": "CA-003: Paginación con mínimo 6 resultados"
+      }
+    },
+    {
+      "name": "17. SPRINT 2 - Detalles de Mascota",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost/adopciones_api/pets/getPetDetails.php?pet_id=1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "path": ["adopciones_api", "pets", "getPetDetails.php"],
+          "query": [
+            {
+              "key": "pet_id",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Obtiene información completa de una mascota específica"
       }
     }
   ]
