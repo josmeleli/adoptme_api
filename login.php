@@ -2,24 +2,41 @@
 require_once __DIR__ . '/config.php';
 
 $data = json_input();
-$email = $data['email'] ?? null;
+$email = trim($data['email'] ?? '');
 $password = $data['password'] ?? null;
 
-if (!$email || !$password) {
+// VALIDACIONES
+
+// 1. Validar que email no esté vacío
+if (empty($email)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Email y contraseña son requeridos']);
+    echo json_encode(['error' => 'El correo electrónico es requerido']);
+    exit;
+}
+
+// 2. Validar formato de email
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Correo electrónico inválido']);
+    exit;
+}
+
+// 3. Validar que contraseña no esté vacía
+if (empty($password)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'La contraseña es requerida']);
     exit;
 }
 
 try {
-    // CA-001: Login con correo/contraseña
-    $stmt = $pdo->prepare('SELECT id, email, name, password_hash, is_verified FROM users WHERE email = :email LIMIT 1');
+    // Login con correo/contraseña
+    $stmt = $pdo->prepare('SELECT id, email, nombres, apellidos, dni, telefono, password_hash, is_verified FROM users WHERE email = :email LIMIT 1');
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch();
     
     if (!$user || !password_verify($password, $user['password_hash'])) {
         http_response_code(401);
-        echo json_encode(['error' => 'Credenciales inválidas']);
+        echo json_encode(['error' => 'Correo electrónico o contraseña incorrectos']);
         exit;
     }
     
@@ -59,7 +76,10 @@ try {
         'user' => [
             'id' => $user['id'],
             'email' => $user['email'],
-            'name' => $user['name']
+            'nombres' => $user['nombres'],
+            'apellidos' => $user['apellidos'],
+            'dni' => $user['dni'],
+            'telefono' => $user['telefono']
         ],
         'expires_at' => date('Y-m-d H:i:s', $expiration_time)
     ]);

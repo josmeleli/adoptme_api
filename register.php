@@ -3,36 +3,84 @@ require_once __DIR__ . '/config.php';
 
 $data = json_input();
 
-$email = $data['email'] ?? null;
+$nombres = trim($data['nombres'] ?? '');
+$apellidos = trim($data['apellidos'] ?? '');
+$dni = trim($data['dni'] ?? '');
+$email = trim($data['email'] ?? '');
+$telefono = trim($data['telefono'] ?? '');
 $password = $data['password'] ?? null;
-$name = $data['name'] ?? null;
-$phone = $data['phone'] ?? null;
 
-// CA-001: Validar formato de correo y contraseña
-if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+// VALIDACIONES COMPLETAS
+
+// 1. Validar nombres (obligatorio, solo letras y espacios)
+if (empty($nombres) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $nombres)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Email válido es requerido']);
+    echo json_encode(['error' => 'Nombres inválidos. Solo se permiten letras y espacios']);
     exit;
 }
 
+// 2. Validar apellidos (obligatorio, solo letras y espacios)
+if (empty($apellidos) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $apellidos)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Apellidos inválidos. Solo se permiten letras y espacios']);
+    exit;
+}
+
+// 3. Validar DNI (exactamente 8 dígitos numéricos)
+if (!preg_match('/^\d{8}$/', $dni)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'DNI inválido. Debe tener exactamente 8 números']);
+    exit;
+}
+
+// 4. Validar email
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Correo electrónico inválido']);
+    exit;
+}
+
+// 5. Validar teléfono (exactamente 9 dígitos numéricos)
+if (!preg_match('/^\d{9}$/', $telefono)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Teléfono inválido. Debe tener exactamente 9 números']);
+    exit;
+}
+
+// 6. Validar contraseña (mínimo 6 caracteres)
 if (!$password || strlen($password) < 6) {
     http_response_code(400);
     echo json_encode(['error' => 'Contraseña debe tener al menos 6 caracteres']);
     exit;
 }
 
-// CA-003: No permitir registros duplicados
+// 7. No permitir emails duplicados
 try {
     $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
     $stmt->execute([':email' => $email]);
     if ($stmt->fetch()) {
         http_response_code(409);
-        echo json_encode(['error' => 'El email ya está registrado']);
+        echo json_encode(['error' => 'El correo electrónico ya está registrado']);
         exit;
     }
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Error al verificar email', 'details' => $e->getMessage()]);
+    exit;
+}
+
+// 8. No permitir DNI duplicados
+try {
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE dni = :dni LIMIT 1');
+    $stmt->execute([':dni' => $dni]);
+    if ($stmt->fetch()) {
+        http_response_code(409);
+        echo json_encode(['error' => 'El DNI ya está registrado']);
+        exit;
+    }
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error al verificar DNI', 'details' => $e->getMessage()]);
     exit;
 }
 
@@ -45,13 +93,15 @@ $verification_expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 try {
     $pdo->beginTransaction();
     
-    // Insertar usuario
-    $stmt = $pdo->prepare('INSERT INTO users (email, password_hash, name, phone, is_verified, created_at) VALUES (:email, :hash, :name, :phone, 0, NOW())');
+    // Insertar usuario con todos los campos
+    $stmt = $pdo->prepare('INSERT INTO users (nombres, apellidos, dni, email, telefono, password_hash, is_verified, created_at) VALUES (:nombres, :apellidos, :dni, :email, :telefono, :hash, 0, NOW())');
     $stmt->execute([
-        ':email' => $email, 
-        ':hash' => $hash,
-        ':name' => $name,
-        ':phone' => $phone
+        ':nombres' => $nombres,
+        ':apellidos' => $apellidos,
+        ':dni' => $dni,
+        ':email' => $email,
+        ':telefono' => $telefono,
+        ':hash' => $hash
     ]);
     $user_id = $pdo->lastInsertId();
     
@@ -70,7 +120,10 @@ try {
     echo json_encode([
         'success' => true, 
         'user_id' => $user_id,
-        'message' => 'Usuario registrado. Revisa tu correo para el código de verificación.',
+        'nombres' => $nombres,
+        'apellidos' => $apellidos,
+        'email' => $email,
+        'message' => 'Usuario registrado exitosamente. Revisa tu correo para el código de verificación.',
         'verification_code' => $verification_code // ELIMINAR EN PRODUCCIÓN
     ]);
     

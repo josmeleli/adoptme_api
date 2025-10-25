@@ -4,15 +4,18 @@
 -- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    dni CHAR(8) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
+    telefono CHAR(9) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    name VARCHAR(100),
-    phone VARCHAR(20),
     distrito VARCHAR(100),
     is_verified TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email)
+    INDEX idx_email (email),
+    INDEX idx_dni (dni)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla de preferencias de usuario (HU-003)
