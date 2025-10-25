@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/email_service.php';
 
 $data = json_input();
 $user_id = $data['user_id'] ?? null;
@@ -40,7 +41,17 @@ try {
     $stmt = $pdo->prepare('UPDATE verification_codes SET used = 1 WHERE id = :id');
     $stmt->execute([':id' => $verification['id']]);
     
+    // Obtener datos del usuario para el email de bienvenida
+    $stmt = $pdo->prepare('SELECT nombres, email FROM users WHERE id = :user_id LIMIT 1');
+    $stmt->execute([':user_id' => $user_id]);
+    $usuario = $stmt->fetch();
+    
     $pdo->commit();
+    
+    // Enviar email de bienvenida
+    if ($usuario) {
+        enviarEmailBienvenida($usuario['email'], $usuario['nombres']);
+    }
     
     echo json_encode(['success' => true, 'message' => 'Usuario verificado correctamente']);
     

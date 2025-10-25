@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/email_service.php';
 
 $data = json_input();
 
@@ -115,17 +116,28 @@ try {
     
     $pdo->commit();
     
-    // En producción, aquí enviarías el código por email/SMS
-    // Por ahora lo devolvemos en la respuesta (solo para desarrollo)
-    echo json_encode([
+    // Intentar enviar el código por email
+    $email_enviado = enviarCodigoVerificacion($email, $nombres, $verification_code);
+    
+    // Respuesta
+    $respuesta = [
         'success' => true, 
         'user_id' => $user_id,
         'nombres' => $nombres,
         'apellidos' => $apellidos,
         'email' => $email,
         'message' => 'Usuario registrado exitosamente. Revisa tu correo para el código de verificación.',
-        'verification_code' => $verification_code // ELIMINAR EN PRODUCCIÓN
-    ]);
+        'email_enviado' => $email_enviado
+    ];
+    
+    // En desarrollo, devolver el código en la respuesta
+    // ELIMINAR EN PRODUCCIÓN
+    if (!$email_enviado) {
+        $respuesta['verification_code'] = $verification_code;
+        $respuesta['message'] .= ' (Email no configurado - código en respuesta para desarrollo)';
+    }
+    
+    echo json_encode($respuesta);
     
 } catch (Exception $e) {
     $pdo->rollBack();
