@@ -90,14 +90,14 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost/adopciones_api/users/getUser.php?id=1",
+          "raw": "http://localhost/adopciones_api/users/getUser.php?user_id=6",
           "protocol": "http",
           "host": ["localhost"],
           "path": ["adopciones_api", "users", "getUser.php"],
           "query": [
             {
-              "key": "id",
-              "value": "1"
+              "key": "user_id",
+              "value": "6"
             }
           ]
         }
@@ -106,7 +106,7 @@
     {
       "name": "5. Actualizar Perfil",
       "request": {
-        "method": "POST",
+        "method": "PUT",
         "header": [
           {
             "key": "Content-Type",
@@ -115,7 +115,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"id\": 1,\n  \"name\": \"Usuario Test Actualizado\",\n  \"distrito\": \"San Isidro\",\n  \"phone\": \"987654321\",\n  \"especie\": \"Perro\",\n  \"tamano\": \"Mediano\",\n  \"edad\": \"Adulto\"\n}"
+          "raw": "{\n  \"user_id\": 6,\n  \"nombres\": \"Luis Alberto\",\n  \"apellidos\": \"Martinez Lopez\",\n  \"distrito\": \"San Isidro\",\n  \"telefono\": \"912345678\",\n  \"especie_preferida\": \"Perro\",\n  \"tamano_preferido\": \"Mediano\",\n  \"edad_preferida\": \"Adulto\"\n}"
         },
         "url": {
           "raw": "http://localhost/adopciones_api/users/updateUser.php",

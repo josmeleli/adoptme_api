@@ -2,23 +2,39 @@
 require_once __DIR__ . '/../config.php';
 
 $data = json_input();
-$id = $data['id'] ?? null;
-if (!$id) {
+$user_id = $data['user_id'] ?? null;
+
+if (!$user_id) {
     http_response_code(400);
     echo json_encode(['error' => 'ID de usuario es requerido']);
     exit;
 }
 
-// CA-001: Validar campos obligatorios si se envían
-if (isset($data['name']) && empty(trim($data['name']))) {
-    http_response_code(400);
-    echo json_encode(['error' => 'El nombre no puede estar vacío']);
-    exit;
+// VALIDACIONES
+// Validar nombres (si se envían)
+if (isset($data['nombres'])) {
+    $nombres = trim($data['nombres']);
+    if (empty($nombres) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $nombres)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Nombres inválidos. Solo se permiten letras y espacios']);
+        exit;
+    }
 }
 
-if (isset($data['phone']) && !preg_match('/^\d{9}$/', $data['phone'])) {
+// Validar apellidos (si se envían)
+if (isset($data['apellidos'])) {
+    $apellidos = trim($data['apellidos']);
+    if (empty($apellidos) || !preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/', $apellidos)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Apellidos inválidos. Solo se permiten letras y espacios']);
+        exit;
+    }
+}
+
+// Validar teléfono (si se envía)
+if (isset($data['telefono']) && !preg_match('/^\d{9}$/', $data['telefono'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'El teléfono debe tener 9 dígitos']);
+    echo json_encode(['error' => 'El teléfono debe tener exactamente 9 dígitos']);
     exit;
 }
 
@@ -27,34 +43,55 @@ try {
     
     // Actualizar campos del usuario principal
     $user_fields = [];
-    $user_params = [':id' => $id];
+    $user_params = [':user_id' => $user_id];
     
-    if (isset($data['name'])) { $user_fields[] = 'name = :name'; $user_params[':name'] = $data['name']; }
-    if (isset($data['email'])) { $user_fields[] = 'email = :email'; $user_params[':email'] = $data['email']; }
-    if (isset($data['phone'])) { $user_fields[] = 'phone = :phone'; $user_params[':phone'] = $data['phone']; }
-    if (isset($data['distrito'])) { $user_fields[] = 'distrito = :distrito'; $user_params[':distrito'] = $data['distrito']; }
+    if (isset($data['nombres'])) { 
+        $user_fields[] = 'nombres = :nombres'; 
+        $user_params[':nombres'] = trim($data['nombres']); 
+    }
+    if (isset($data['apellidos'])) { 
+        $user_fields[] = 'apellidos = :apellidos'; 
+        $user_params[':apellidos'] = trim($data['apellidos']); 
+    }
+    if (isset($data['telefono'])) { 
+        $user_fields[] = 'telefono = :telefono'; 
+        $user_params[':telefono'] = $data['telefono']; 
+    }
+    if (isset($data['distrito'])) { 
+        $user_fields[] = 'distrito = :distrito'; 
+        $user_params[':distrito'] = $data['distrito']; 
+    }
     
     if (!empty($user_fields)) {
-        $sql = 'UPDATE users SET ' . implode(', ', $user_fields) . ' WHERE id = :id';
+        $sql = 'UPDATE users SET ' . implode(', ', $user_fields) . ' WHERE id = :user_id';
         $stmt = $pdo->prepare($sql);
         $stmt->execute($user_params);
     }
     
-    // CA-002: Actualizar preferencias opcionales (especie, tamaño, edad)
-    // CA-003: Permite edición en cualquier momento
-    if (isset($data['especie']) || isset($data['tamano']) || isset($data['edad'])) {
+    // Actualizar preferencias opcionales (especie, tamaño, edad)
+    if (isset($data['especie_preferida']) || isset($data['tamano_preferido']) || isset($data['edad_preferida'])) {
         // Verificar si ya tiene preferencias
-        $stmt = $pdo->prepare('SELECT user_id FROM user_preferences WHERE user_id = :id');
-        $stmt->execute([':id' => $id]);
+        $stmt = $pdo->prepare('SELECT user_id FROM user_preferences WHERE user_id = :user_id');
+        $stmt->execute([':user_id' => $user_id]);
         $has_preferences = $stmt->fetch();
         
         if ($has_preferences) {
             // Actualizar preferencias existentes
             $pref_fields = [];
-            $pref_params = [':user_id' => $id];
-            if (isset($data['especie'])) { $pref_fields[] = 'especie_preferida = :especie'; $pref_params[':especie'] = $data['especie']; }
-            if (isset($data['tamano'])) { $pref_fields[] = 'tamano_preferido = :tamano'; $pref_params[':tamano'] = $data['tamano']; }
-            if (isset($data['edad'])) { $pref_fields[] = 'edad_preferida = :edad'; $pref_params[':edad'] = $data['edad']; }
+            $pref_params = [':user_id' => $user_id];
+            
+            if (isset($data['especie_preferida'])) { 
+                $pref_fields[] = 'especie_preferida = :especie'; 
+                $pref_params[':especie'] = $data['especie_preferida']; 
+            }
+            if (isset($data['tamano_preferido'])) { 
+                $pref_fields[] = 'tamano_preferido = :tamano'; 
+                $pref_params[':tamano'] = $data['tamano_preferido']; 
+            }
+            if (isset($data['edad_preferida'])) { 
+                $pref_fields[] = 'edad_preferida = :edad'; 
+                $pref_params[':edad'] = $data['edad_preferida']; 
+            }
             
             if (!empty($pref_fields)) {
                 $sql = 'UPDATE user_preferences SET ' . implode(', ', $pref_fields) . ' WHERE user_id = :user_id';
@@ -65,10 +102,10 @@ try {
             // Crear nuevas preferencias
             $stmt = $pdo->prepare('INSERT INTO user_preferences (user_id, especie_preferida, tamano_preferido, edad_preferida) VALUES (:user_id, :especie, :tamano, :edad)');
             $stmt->execute([
-                ':user_id' => $id,
-                ':especie' => $data['especie'] ?? null,
-                ':tamano' => $data['tamano'] ?? null,
-                ':edad' => $data['edad'] ?? null
+                ':user_id' => $user_id,
+                ':especie' => $data['especie_preferida'] ?? null,
+                ':tamano' => $data['tamano_preferido'] ?? null,
+                ':edad' => $data['edad_preferida'] ?? null
             ]);
         }
     }
@@ -78,6 +115,11 @@ try {
     
 } catch (Exception $e) {
     $pdo->rollBack();
+    http_response_code(500);
+    echo json_encode(['error' => 'No se pudo actualizar el perfil', 'details' => $e->getMessage()]);
+}
+
+?>
     http_response_code(500);
     echo json_encode(['error' => 'No se pudo actualizar el perfil', 'details' => $e->getMessage()]);
 }
