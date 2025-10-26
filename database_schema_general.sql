@@ -422,7 +422,7 @@ VALUES (
     '00000001', 
     'admin@adoptme.com', 
     '999999999', 
-    '$2y$10$YourHashedPasswordHere', 
+    '$2y$10$TvJF7/lrpsaAKM2C9U.NVuVQzy.oVFkSGyRp4HsNunCDRSQPicJ2a', 
     'admin', 
     1
 ) ON DUPLICATE KEY UPDATE role = 'admin', is_verified = 1;
