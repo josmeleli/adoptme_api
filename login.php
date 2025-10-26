@@ -30,7 +30,7 @@ if (empty($password)) {
 
 try {
     // Login con correo/contraseña
-    $stmt = $pdo->prepare('SELECT id, email, nombres, apellidos, dni, telefono, password_hash, is_verified FROM users WHERE email = :email LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id, email, nombres, apellidos, dni, telefono, password_hash, is_verified, role FROM users WHERE email = :email LIMIT 1');
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch();
     
@@ -79,7 +79,8 @@ try {
             'nombres' => $user['nombres'],
             'apellidos' => $user['apellidos'],
             'dni' => $user['dni'],
-            'telefono' => $user['telefono']
+            'telefono' => $user['telefono'],
+            'role' => $user['role'] ?? 'user' // Sprint 3: incluir role
         ],
         'expires_at' => date('Y-m-d H:i:s', $expiration_time)
     ]);
